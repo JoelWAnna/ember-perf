@@ -14,15 +14,19 @@ function t() {
 RenderData.prototype = {
 
   finish() {
+    Monitor.Start("RenderData#finish");
     this.endTime = t();
     this.elapsedTime = this.endTime - this.startTime;
     this._active = false;
+    Monitor.Stop("RenderData#finish");
   },
 
   _viewAdded(/* view, index */) { },
 
   willRender(name, timestamp, payload) {
+    Monitor.Start("RenderData#willRender");
     if (!this._active) {
+      Monitor.Stop("RenderData#willRender");
       return;
     }
 
@@ -46,11 +50,14 @@ RenderData.prototype = {
         this._viewAdded(v, viewIdx);
         break;
     }
+    Monitor.Stop("RenderData#willRender");
   },
 
   didRender(name, timestamp, payload) {
+    Monitor.Start("RenderData#didRender");
     if (!this._active) {
       return;
+      Monitor.Stop("RenderData#didRender");
     }
 
     switch (name) {
@@ -63,6 +70,7 @@ RenderData.prototype = {
         viewData.elapsedTime = viewData.endTime - viewData.startTime;
         break;
     }
+    Monitor.Stop("RenderData#didRender");
   }
 };
 

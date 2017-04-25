@@ -58,7 +58,9 @@ export default Base.extend(Evented, {
    * @private
    */
   _measureTransition(transitionInfo) {
+    Monitor.Start("EmberPerf#_measureTransition");
     if (transitionInfo.promise._emberPerfTransitionId) {
+      Monitor.Stop("EmberPerf#_measureTransition");
       return;
     }
     transitionInfo.promise._emberPerfTransitionId = transitionCounter++;
@@ -92,6 +94,7 @@ export default Base.extend(Evented, {
         this.trigger('transitionComplete', event);
       });
     });
+    Monitor.Stop("EmberPerf#_measureTransition");
   },
 
   /**
@@ -101,6 +104,7 @@ export default Base.extend(Evented, {
    * @public
    */
   measureRender() {
+    Monitor.Start("EmberPerf#_measureRender");
     this.transitionData = null;
 
     let deferred = defer(`measureRender`);
@@ -115,6 +119,7 @@ export default Base.extend(Evented, {
       deferred.resolve(event);
     });
 
+    Monitor.Stop("EmberPerf#_measureRender");
     return deferred.promise;
   },
 
@@ -160,6 +165,7 @@ export default Base.extend(Evented, {
   },
 
   transitionLogger: on('transitionComplete', function(data) {
+    Monitor.Start("EmberPerf#transitionComplete");
     if (this.get('debugMode')) {
       console.group(`Top-Level Transition to ${data.destRoute} (${data.destURL}): ${data.elapsedTime}ms`);
       for (let i = 0; i < data.routes.length; i++) {
@@ -174,9 +180,11 @@ export default Base.extend(Evented, {
       }
       console.groupEnd();
     }
+    Monitor.Stop("EmberPerf#transitionComplete");
   }),
 
   renderLogger: on('renderComplete', function(data) {
+    Monitor.Start("EmberPerf#renderComplete");
     if (this.get('debugMode')) {
       console.group(`Render Completed: ${data.elapsedTime}ms`);
       for (let i = 0; i < data.viewData.length; i++) {
@@ -185,5 +193,6 @@ export default Base.extend(Evented, {
       }
       console.groupEnd();
     }
+    Monitor.Stop("EmberPerf#renderComplete");
   })
 });
